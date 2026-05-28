@@ -46,38 +46,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
 
     // Проверяем, авторизован ли пользователь
-    $logged_in = false;
-    if (!empty($_COOKIE[session_name()]) && isset($_SESSION['login'])) {
-        $logged_in = true;
-        $messages[] = '<div class="success-message">Вы вошли как: ' . htmlspecialchars($_SESSION['login']) . '. <a href="login.php?logout=1">Выйти</a></div>';
-        
-        // Загружаем данные пользователя из БД
-        try {
-            $stmt = $db->prepare("SELECT * FROM users WHERE user_id = ? ORDER BY id DESC LIMIT 1");
-            $stmt->execute([$_SESSION['uid']]);
-            $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($user_data) {
-                $values['full_name'] = $user_data['full_name'];
-                $values['phone'] = $user_data['phone'];
-                $values['email'] = $user_data['email'];
-                $values['birth_date'] = $user_data['birth_date'];
-                $values['gender'] = $user_data['gender'];
-                $values['biography'] = $user_data['biography'];
-                $values['agreed'] = $user_data['agreed'];
-                
-                // Загружаем языки
-                $stmt_lang = $db->prepare("SELECT pl.name FROM user_languages ul 
-                                           JOIN programming_languages pl ON ul.language_id = pl.id 
-                                           WHERE ul.user_id = ?");
-                $stmt_lang->execute([$user_data['id']]);
-                $langs = $stmt_lang->fetchAll(PDO::FETCH_COLUMN);
-                $values['languages'] = implode(',', $langs);
-            }
-        } catch (PDOException $e) {
-            $messages[] = '<div class="error-message">Ошибка загрузки данных: ' . $e->getMessage() . '</div>';
+$logged_in = false;
+if (!empty($_COOKIE[session_name()]) && isset($_SESSION['login'])) {
+    $logged_in = true;
+    // ТОЛЬКО СООБЩЕНИЕ, БЕЗ ССЫЛКИ НА ВЫХОД
+    $messages[] = '<div class="success-message">Вы вошли как: ' . htmlspecialchars($_SESSION['login']) . '</div>';
+    
+    // Загружаем данные пользователя из БД
+    try {
+        $stmt = $db->prepare("SELECT * FROM users WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$_SESSION['uid']]);
+        $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($user_data) {
+            $values['full_name'] = $user_data['full_name'];
+            $values['phone'] = $user_data['phone'];
+            $values['email'] = $user_data['email'];
+            $values['birth_date'] = $user_data['birth_date'];
+            $values['gender'] = $user_data['gender'];
+            $values['biography'] = $user_data['biography'];
+            $values['agreed'] = $user_data['agreed'];
+            
+            // Загружаем языки
+            $stmt_lang = $db->prepare("SELECT pl.name FROM user_languages ul 
+                                       JOIN programming_languages pl ON ul.language_id = pl.id 
+                                       WHERE ul.user_id = ?");
+            $stmt_lang->execute([$user_data['id']]);
+            $langs = $stmt_lang->fetchAll(PDO::FETCH_COLUMN);
+            $values['languages'] = implode(',', $langs);
         }
+    } catch (PDOException $e) {
+        $messages[] = '<div class="error-message">Ошибка загрузки данных: ' . $e->getMessage() . '</div>';
     }
-
+}
     if ($errors['full_name']) {
         $messages[] = '<div class="error-message">Ошибка в поле "ФИО": ФИО должно содержать только буквы, пробелы и дефисы (не более 150 символов).</div>';
     }
