@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $logged_in = false;
     if (!empty($_COOKIE[session_name()]) && isset($_SESSION['login'])) {
         $logged_in = true;
-        $messages[] = '<div class="success-message">Вы вошли как: ' . htmlspecialchars($_SESSION['login']) . '. <a href="logout.php">Выйти</a></div>';
+        $messages[] = '<div class="success-message">Вы вошли как: ' . htmlspecialchars($_SESSION['login']) . '. <a href="login.php?logout=1">Выйти</a></div>';
         
         // Загружаем данные пользователя из БД
         try {
