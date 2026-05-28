@@ -93,14 +93,17 @@
 <div class="container">
     <h1>Регистрационная форма</h1>
     
+    <!-- БЛОК АВТОРИЗАЦИИ: здесь отображается статус входа -->
     <div class="auth-link">
         <?php if (isset($_SESSION['login'])): ?>
+            <!-- ВЫХОД: ссылка НЕ на logout.php, а на login.php с параметром logout=1 -->
             <a href="login.php?logout=1">Выйти (<?= htmlspecialchars($_SESSION['login']) ?>)</a>
         <?php else: ?>
             <a href="login.php">Войти</a> для изменения данных
         <?php endif; ?>
     </div>
 
+    <!-- СООБЩЕНИЯ: выводятся ошибки валидации или сообщение об успехе -->
     <?php if (!empty($messages)): ?>
         <div id="messages">
             <?php foreach ($messages as $message): ?>
@@ -109,9 +112,11 @@
         </div>
     <?php endif; ?>
 
+    <!-- ФОРМА: action="" означает отправку на ту же страницу -->
     <form action="" method="POST">
         <div class="form-group">
             <label class="required">ФИО</label>
+            <!-- value подставляется из Cookies (ошибка) или из БД (авторизован) -->
             <input type="text" name="full_name" 
                    class="<?= $errors['full_name'] ? 'error-input' : '' ?>"
                    value="<?= htmlspecialchars($values['full_name'] ?? '') ?>"
@@ -139,6 +144,7 @@
 
         <div class="form-group">
             <label class="required">Дата рождения</label>
+            <!-- Поле TEXT, а не DATE, чтобы браузер не мешал серверной валидации -->
             <input type="text" name="birth_date" 
                    class="<?= $errors['birth_date'] ? 'error-input' : '' ?>"
                    value="<?= htmlspecialchars($values['birth_date'] ?? '') ?>"
@@ -158,6 +164,7 @@
 
         <div class="form-group">
             <label class="required">Любимый язык программирования</label>
+            <!-- MULTIPLE: позволяет выбрать несколько языков (Ctrl + клик) -->
             <select name="languages[]" multiple
                     class="<?= $errors['languages'] ? 'error-input' : '' ?>">
                 <?php
